@@ -1,9 +1,9 @@
 import numpy as np
-m = 6
-n = 8
-nu = 5
+m = 3
+n = 16
+nu = 16
 # u = 2
-lam = 30
+lam = 31
 # L = np.zeros((m, n))
 
 L = np.zeros((m+n+1, m+n+1))
