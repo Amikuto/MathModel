@@ -80,10 +80,10 @@ Task 4
 
 
 def task4(matrix, k, i, j):
-    buffer_matrix = matrix_out = matrix.copy()
+    buff_matrix = matrix_out = matrix.copy()
     for c in range(k-1):
-        buffer_matrix = skip_function(bf_mrx=buffer_matrix, matrix=matrix, matrix_length=len(matrix))
-        matrix_out += buffer_matrix
+        buff_matrix = skip_function(bf_mrx=buff_matrix, matrix=matrix, matrix_length=len(matrix))
+        matrix_out += buff_matrix
     return matrix_out[i-1][j-1]
 
 
@@ -97,10 +97,10 @@ Task 5
 
 
 def task5(matrix, i, j):
-    buffer_matrix = matrix_out = matrix.copy()
+    bf_mrx = matrix_out = matrix.copy()
     for t in range(1, 2048):
-        buffer_matrix = skip_function(bf_mrx=buffer_matrix, matrix=matrix, matrix_length=len(matrix))
-        matrix_out += t * buffer_matrix
+        bf_mrx = skip_function(bf_mrx=bf_mrx, matrix=matrix, matrix_length=len(matrix))
+        matrix_out += t * bf_mrx
     return matrix_out[i-1][j-1]
 
 
@@ -108,20 +108,9 @@ i, j = 2, 8
 print("Задание 5: ", task5(matrix=P, i=i, j=j))
 
 
-
 """
 Task 6
 """
-
-def tf(matrix, k, massive):
-    x = np.linalg.matrix_power(matrix, k) - \
-               sum([tf(matrix=matrix, k=num, massive=None) * np.linalg.matrix_power(matrix, k - num) for num in range(1, k)])
-    if massive is not None:
-        massive.append(np.diagonal(x))
-        return x, massive
-
-    else:
-        return x
 
 
 def task6(matrix, k, i):
@@ -141,7 +130,11 @@ def task6(matrix, k, i):
     #     np.linalg.matrix_power(before_matrix, 3) - ((x2 - (x1 * x1)) * x1) - (x2 * x1)
     # )[0])
 
-    return np.diagonal(tf(matrix=matrix, k=k, massive=None))[i - 1]
+    def func(k):
+        return np.linalg.matrix_power(matrix, k) - \
+               sum([func(num) * np.linalg.matrix_power(matrix, k - num) for num in range(1, k)])
+
+    return np.diagonal(func(k))[i - 1]
 
 
 i, k = 8, 9
@@ -156,8 +149,14 @@ Task 7
 def task7(matrix, k, i):
     out = []
 
-    out = tf(matrix=matrix, k=k, massive=out)
-    return sum(out)[i-1][i-2]
+    def func(k):
+        res = np.linalg.matrix_power(matrix, k) - sum([func(num) * np.linalg.matrix_power(matrix, k - num) for num in range(1, k)])
+
+        out.append(np.diagonal(res))
+        return res
+
+    func(k)
+    return sum(out)[i - 1]
 
 
 i, k = 11, 6
@@ -170,18 +169,17 @@ Task 8
 
 
 def task8(matrix, i):
-    out = []
+    result = []
 
     def func(k):
-        x = np.linalg.matrix_power(matrix, k) - \
-            sum([func(num) * np.linalg.matrix_power(matrix, k - num) for num in range(1, k)])
-        out.append(k * np.diagonal(x))
-        return x
+        res = np.linalg.matrix_power(matrix, k) - sum(
+            [func(num) * np.linalg.matrix_power(matrix, k - num) for num in range(1, k)])
+        result.append(k * np.diagonal(res))
+        return res
 
     func(i)
-
-    # out = tf(matrix=matrix, k=k, massive=out)
-    return sum(out)[6]
+    # print(result)
+    return sum(result)[i-1]
 
 
 i = 10
@@ -214,4 +212,4 @@ def task9(matrix):
     return X
 
 
-print("Задание 9: ", task9(matrix=P))
+print("Задание 9: ",task9(matrix=P))
